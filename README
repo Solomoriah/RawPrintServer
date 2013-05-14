@@ -1,0 +1,162 @@
+###########################################################################
+
+Raw Print Server
+Copyright 2005 Chris Gonnerman
+All rights reserved.
+
+BSD Licensed (See the included LICENSE file for details)
+
+###########################################################################
+INTRODUCTION
+
+This is my implementation of a "Raw" print server.  It allows a computer
+to pretend to be a "Socket API" or "AppSocket" print server, i.e. a network
+connected printer.  In fact, this program can serve a number of printers,
+each with its own port, simultaneously.
+
+
+###########################################################################
+CREDIT WHERE CREDIT IS DUE DEPARTMENT
+
+This software would not exist without Sam Rushing's excellent asyncore
+module, nor would it exist without Steve Holden's excellent explanation of
+that module (in his book "Python Web Programming" from New Riders, a truly
+outstanding book that I can't recommend enough) from which I learned enough
+to write this server.  I'm also indebted to Guido van Rossum for Python 
+itself, which has made my life SO much easier, and to Mark Hammond for the
+win32all modules which are essential parts of the Windows version of the
+print server.
+
+
+###########################################################################
+RELEASE NOTES
+
+This is version 0.1 of the Raw Print Server.  There are no installation
+instructions to speak of; I plan to write an install script to assist with
+getting the software up and running, but for now it's all manual.
+
+You will need a working Python 2.x system to run the print server itself,
+and if you are installing on Windows you'll need a working set of the 
+win32all modules from Mark Hammond (which you really ought to have anyway).
+To run the GUI properties program, you'll need a working PyGTK module set,
+and on Windows that means finding a compatible GTK+ runtime also.
+
+Finding all of the above is left as an exercise for the reader.
+
+sigh
+
+Okay.  If you are on a recent Linux system, or any of the BSD family, you 
+should be able to install all of the above from your original installation
+media, or download them from the appropriate website for your distribution.
+
+If you are running Windows, start by getting a recent Python build from
+www.python.org; follow the links from that site to the win32all downloads
+(currently somewhere on Sourceforge).  After that, go to www.pygtk.org and
+follow their links to the downloads you need for Windows.  Note that as of
+this time (October 2005), the GTK libraries normally used for the Gimp 
+don't work with PyGTK (despite notes on the PyGTK for Windows site saying 
+that they do), at least, not on Win9x.  Get the runtime or development
+libraries referenced from the PyGTK for Windows site.  If you already have
+the Gimp installed, uninstall the GTK+ libraries you got with it before 
+installing the alternate runtime.  My Gimp still works, so it must be okay,
+right?
+
+REMEMBER, as it says in the legal bit at the top, this is all at your own
+risk and I'm not responsible if the software does harm, or simply doesn't 
+work at all.  I've made every effort to make it good, clean, reliable 
+stuff, but there are NO GUARANTEES or WARRANTIES.  You paid me nothing
+for it, how could you expect me to give you anything if it goes wrong?
+
+After you get that stuff installed, find a folder to unpack the software
+into, and do that.  I use C:\Program Files\RawPrintServer on Windows, but
+on Linux I'm not sure where the "right" place is to put it.
+
+Run the rpsprops.pyw script first.  It prompts you for the spool directory,
+logfile name (and path), and the printer(s) to support.  These settings 
+are saved to the configuration file (/etc/rpsrv.conf on Linux/Unix/BSD, 
+C:\WINDOWS\SYSTEM32\rpsrv.conf on Windows).
+
+I recommend the following on Windows:
+
+    Spool Directory    C:\WINDOWS\TEMP
+    Log File           C:\WINDOWS\rps.log
+
+For Unixoids, use what you like.  The proper place for rps.log is probably 
+under /var/log, and you could either use a temp folder (/tmp or /var/tmp) 
+or create a folder under /var/spool (probably a better place).
+
+The printer definitions are created using the Add button in the GUI.  You
+need to define a different port number for each printer; the "standard"
+port is 9100, but I've seen 10000 and 10001 used a lot also.  The printer
+name on Unixoids is the standard LPR or CUPS name.  For Windows, you can
+pull down a list showing the currently-defined "local" printers to select
+from.
+
+Note that the Quit button in the GUI doesn't presently ask about saving.
+Don't forget the Save button!
+
+If you don't have or want PyGTK on your system, you can easily create the
+rpsrv.conf file by hand; it looks like this (between the lines):
+
+------------------------------------------
+spooldir = /var/tmp
+logfile = /var/log/rps.log
+printer = 9100, lp
+printer = 9101, dotmatrix
+------------------------------------------
+
+Note that the "printer" directive can appear multiple times, each time
+defining a different printer.  Blank lines are ignored, as are lines 
+beginning with the # character.  The GUI doesn't preserve comments, so
+if you create the file by hand and then edit it with the GUI, expect your
+commentary to disappear.
+
+To start the server on a Unixoid system, just run RawPrintServer.py.  It 
+daemonizes itself automatically.  RawPrintServer.py does not need to be 
+run as root (except if you choose to use reserved port numbers), so for 
+security reasons I recommend you run it as a regular user, preferrably one 
+created just for the purpose.  This is also left as an exercise for the
+reader.
+
+For Windows NT/2000/2003/XP, use RawPrintService.py.  Run it from the
+command line like this:
+
+    start RawPrintServer.py install
+
+"start" may or may not be needed, depending on the version of Windows you
+are using.
+
+After doing this, go look in the Services control panel interface, and
+you'll find "Raw Print Server" listed.  Start it, and then (if you want)
+right-click and choose "Properties" and make the startup Automatic.
+
+Presently there is no version for use on Win9x.  This is a minor thing to
+create (mainly just strip the Unixoid daemonizing parts out of 
+RawPrintServer.py) but I haven't done it yet.
+
+
+###########################################################################
+FUTURE PLANS
+
+I plan to create an installer script to make setting this whole thing up
+easier.  I also intend to add a minor security feature to the program: an 
+IP address "stem" that must be matched before a connection will be allowed.
+For instance, if the stem is "192.168.0.", then only computers in the
+192.168.0.XXX subnet would be allowed to use the printer.  This isn't a big
+deal if you have a NAT firewall, but otherwise it is probably necessary. 
+No telling where your print jobs might come from...
+
+I might even set it up to accept a list of such "stems" to accommodate 
+those with more complicated networks.
+
+
+###########################################################################
+CONTACTING ME
+
+If you have questions, comments, or (I hope) enhancements regarding my 
+Raw Print Server, please feel free to contact me at:
+
+    chris.gonnerman@newcenturycomputers.net
+
+
+###########################################################################

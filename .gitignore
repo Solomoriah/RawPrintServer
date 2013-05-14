@@ -1,0 +1,5 @@
+*.o
+build
+dist
+*.pyc
+RCS
